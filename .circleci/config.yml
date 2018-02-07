@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn run test
+      - store_test_results:
+          path: ~/project/junit.xml
+
+  appr:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run: yarn
+      - run: 'if [ "$CI_PULL_REQUEST" != "" ]; then yarn appr; fi'
+
+workflows:
+  version: 2
+  test-and-post:
+    jobs:
+      - test
+      - appr:
+          requires:
+            - test
